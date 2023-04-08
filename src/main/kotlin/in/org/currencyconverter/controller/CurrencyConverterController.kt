@@ -8,17 +8,22 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.client.RestTemplate
+import org.thymeleaf.context.Context
+import org.thymeleaf.spring5.SpringTemplateEngine
 import java.math.BigDecimal
 
 data class CurrencyConversionResult(val base: String, val rates: Map<String, BigDecimal>)
 
 @RestController
-class CurrencyConverterController {
+class CurrencyConverterController(
+    private val springTemplateEngine: SpringTemplateEngine
+) {
 
     @GetMapping("/")
     fun index(model: Model): String {
-        model.addAttribute("currencies", listOf("EUR", "USD", "GBP"))
-        return "index"
+        val context = Context()
+        context.setVariable("currencies", listOf("EUR", "USD", "GBP"))
+        return springTemplateEngine.process("index", context)
     }
 
     @GetMapping("/convert")
